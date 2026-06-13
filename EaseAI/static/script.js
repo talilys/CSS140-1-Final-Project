@@ -1,0 +1,178 @@
+/* EaseAI — script.js */
+
+const chatMessages = document.getElementById("chat-messages");
+const chatScroll   = document.getElementById("chat-scroll");
+const userInput    = document.getElementById("user-input");
+const sendBtn      = document.getElementById("send-btn");
+const menuToggle   = document.getElementById("menu-toggle");
+const sidebar      = document.querySelector(".sidebar");
+
+// Sidebar toggle (mobile)
+menuToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+});
+
+document.addEventListener("click", (e) => {
+  if (sidebar.classList.contains("open") &&
+      !sidebar.contains(e.target) &&
+      !menuToggle.contains(e.target)) {
+    sidebar.classList.remove("open");
+  }
+});
+
+// Auto-resize textarea
+userInput.addEventListener("input", () => {
+  userInput.style.height = "auto";
+  userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px";
+});
+
+// Scroll to bottom
+function scrollBottom() {
+  chatScroll.scrollTop = chatScroll.scrollHeight;
+}
+
+// Add a user bubble
+function addUserMessage(text) {
+  const row = document.createElement("div");
+  row.className = "msg-row user-row";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar user-avatar";
+  avatar.textContent = "U";
+
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble user-bubble";
+  bubble.textContent = text;
+
+  row.appendChild(bubble);
+  row.appendChild(avatar);
+  chatMessages.appendChild(row);
+  scrollBottom();
+}
+
+// Add typing indicator
+function addTypingIndicator() {
+  const row = document.createElement("div");
+  row.className = "typing-row";
+  row.id = "typing-row";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar bot-avatar";
+  avatar.textContent = "E";
+
+  const bubble = document.createElement("div");
+  bubble.className = "typing-bubble";
+  bubble.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  chatMessages.appendChild(row);
+  scrollBottom();
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById("typing-row");
+  if (el) el.remove();
+}
+
+// Sentiment label map
+const SENTIMENT_LABELS = {
+  positive: "Feeling positive",
+  negative: "Stressed / low mood",
+  neutral:  "Neutral",
+  unclear:  "Tell me more",
+  crisis:   "Please seek support",
+  sarcasm:  "I see you 👀 — how are you really?",
+};
+
+// Add a bot bubble
+function addBotMessage(text, sentiment, confidence) {
+  const row = document.createElement("div");
+  row.className = "msg-row bot-row";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar bot-avatar";
+  avatar.textContent = "E";
+
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble bot-bubble";
+
+  const p = document.createElement("p");
+  p.textContent = text;
+  bubble.appendChild(p);
+
+  if (sentiment) {
+    const chip = document.createElement("div");
+    chip.className = "mood-chip chip-" + sentiment;
+    chip.textContent = SENTIMENT_LABELS[sentiment] || sentiment;
+
+    if (sentiment !== "unclear" && sentiment !== "crisis" && confidence !== null) {
+      const conf = document.createElement("span");
+      conf.className = "chip-confidence";
+      conf.textContent = " · " + confidence + "%";
+      chip.appendChild(conf);
+    }
+
+    bubble.appendChild(chip);
+  }
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  chatMessages.appendChild(row);
+  scrollBottom();
+}
+
+// Send message — guarded with isSending flag
+let isSending = false;
+
+async function sendMessage() {
+  if (isSending) return;
+
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  isSending = true;
+  sendBtn.disabled = true;
+
+  addUserMessage(message);
+  userInput.value = "";
+  userInput.style.height = "auto";
+
+  addTypingIndicator();
+  await new Promise(function(r) { setTimeout(r, 600); });
+
+  try {
+    const res = await fetch("/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: message }),
+    });
+
+    const data = await res.json();
+    removeTypingIndicator();
+
+    if (data.error) {
+      addBotMessage("Sorry, something went wrong. Please try again.", null, null);
+    } else {
+      addBotMessage(data.response, data.sentiment, data.confidence);
+    }
+
+  } catch (err) {
+    removeTypingIndicator();
+    addBotMessage("Oops! I couldn't connect to the server.", null, null);
+    console.error(err);
+  }
+
+  isSending = false;
+  sendBtn.disabled = false;
+}
+
+// Event listeners
+sendBtn.addEventListener("click", sendMessage);
+
+userInput.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
