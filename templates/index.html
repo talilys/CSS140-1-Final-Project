@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaseAI — Student Mood Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">EaseAI</span>
+    </div>
+    <p class="sidebar-tagline">Your student stress<br>&amp; mood companion</p>
+
+    <div class="user-profile-section" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="avatar user-avatar" style="width: 32px; height: 32px; background: #52796f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+          {{ session['username'][0].upper() if session.get('username') else 'U' }}
+        </div>
+        <span class="username-display" style="font-size: 14px; font-weight: 500; color: #2c3e50; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {{ session['username'] if session.get('username') else 'Student' }}
+        </span>
+      </div>
+      <a href="/logout" class="logout-btn" style="padding: 6px 12px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 12px; transition: background 0.2s;">Log Out</a>
+    </div>
+
+    <div class="mood-legend">
+      <p class="legend-label">Mood key</p>
+      <div class="legend-item">
+        <span class="legend-dot dot-positive"></span>
+        <span>Positive</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot dot-negative"></span>
+        <span>Stressed / Low</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot dot-neutral"></span>
+        <span>Neutral</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot dot-unclear"></span>
+        <span>Unclear — tell me more</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background:#9b6ddf"></span>
+        <span>Sarcasm detected</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <p class="disclaimer-text">
+        EaseAI is a school project and is not a substitute for professional mental health support.
+        If you are in crisis, please contact a counselor or local helpline.
+      </p>
+    </div>
+  </aside>
+
+  <main class="chat-main">
+
+    <div class="chat-topbar">
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="topbar-title">EaseAI</span>
+      <div class="status-dot-wrap">
+        <span class="status-dot"></span>
+        <span class="status-text">Active</span>
+      </div>
+    </div>
+
+    <div class="chat-scroll" id="chat-scroll">
+      <div class="chat-messages" id="chat-messages">
+
+        <div class="msg-row bot-row">
+          <div class="avatar bot-avatar">E</div>
+          <div class="msg-bubble bot-bubble">
+            <p>Hi there 👋 I'm EaseAI. I'm here to listen and support you through the ups and downs of school life.</p>
+            <p style="margin-top:8px;">How are you feeling today?</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="input-row">
+        <textarea
+          id="user-input"
+          placeholder="Share how you're feeling…"
+          rows="1"
+          autocomplete="off"
+          aria-label="Your message"
+        ></textarea>
+        <button id="send-btn" aria-label="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

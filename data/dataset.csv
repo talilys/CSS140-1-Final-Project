@@ -1,0 +1,239 @@
+text,label
+"I just passed my major exam, I feel so relieved",positive
+"I'm so happy because my project got a perfect score",positive
+"Today was a great day, my professor praised my work",positive
+"I finally finished all my requirements before the deadline",positive
+"I feel motivated to study after watching that lecture",positive
+"My groupmates and I worked really well together today",positive
+"I got a high grade on my thesis defense, I'm so proud",positive
+"I'm excited for the campus event tomorrow",positive
+"I feel confident about my upcoming presentation",positive
+"Thank you for helping me understand this topic better",positive
+"I love how supportive my classmates are",positive
+"I finally understood the lesson after reviewing again",positive
+"I'm grateful for my professor's guidance",positive
+"This week has been productive and I feel accomplished",positive
+"I'm proud of how much I improved this semester",positive
+"I had a relaxing weekend and I feel recharged",positive
+"My friends cheered me up when I felt down",positive
+"I aced my quiz today, I'm so thrilled",positive
+"I feel good about my study habits lately",positive
+"I'm thankful for this opportunity to learn new things",positive
+"I feel relaxed after finishing my report early",positive
+"I'm satisfied with how my presentation went",positive
+"I feel calm and ready for my exam",positive
+"My adviser said my thesis is on the right track",positive
+"I enjoyed working on this project with my team",positive
+"I'm happy that my groupmates appreciated my effort",positive
+"I feel proud of completing my OJT requirements",positive
+"I'm thankful my professor extended the deadline",positive
+"I feel inspired after talking with my mentor",positive
+"I am hopeful that things will get better this semester",positive
+"I passed all my subjects this semester, I'm overjoyed",positive
+"My defense went really well and I'm so relieved",positive
+"I feel energized after a good night's sleep",positive
+"My teacher gave me positive feedback on my essay",positive
+"I'm celebrating because we finished the group project early",positive
+"I feel like I'm finally on top of my workload",positive
+"I had fun studying with my friends today",positive
+"I'm excited to learn new things in this subject",positive
+"I'm proud that I managed my time well this week",positive
+"I feel optimistic about my grades this term",positive
+"Everything went smoothly during my recitation today",positive
+"I'm thankful for the encouragement from my classmates",positive
+"I feel light and stress-free after submitting my paper",positive
+"I'm glad I asked for help, it made things easier",positive
+"I feel accomplished after organizing my schedule",positive
+"My professor said I did a great job on my report",positive
+"I'm in a good mood because classes were fun today",positive
+"I feel refreshed after taking a short break",positive
+"I'm happy with the progress of our thesis",positive
+"I feel confident I can handle this semester well",positive
+"I finally got enough sleep and I feel amazing",positive
+"My groupmate covered for me and I'm really grateful",positive
+"I crushed my presentation today, everyone clapped",positive
+"I feel at peace after taking a walk between classes",positive
+"My study group is so encouraging, I love it",positive
+"I just got accepted into the scholarship program",positive
+"I feel proud every time I look at my progress",positive
+"I am so stressed because of all my deadlines this week",negative
+"I feel anxious about my upcoming exams",negative
+"I'm overwhelmed with all these school requirements",negative
+"I failed my quiz and I feel really bad about it",negative
+"I can't sleep because I'm worried about my thesis",negative
+"I feel like I'm not good enough for this course",negative
+"I'm exhausted from studying all night",negative
+"I feel like giving up on this project",negative
+"My groupmates are not cooperating and it's frustrating",negative
+"I'm scared I won't pass this semester",negative
+"I feel so much pressure from my parents about my grades",negative
+"I'm crying because I have too much workload",negative
+"I feel hopeless about finishing all my requirements",negative
+"I'm having a panic attack because of my deadlines",negative
+"I feel lonely and stressed during exam week",negative
+"I hate how much pressure school puts on us",negative
+"I feel like I'm burning out from all this work",negative
+"I'm angry because my project got rejected",negative
+"I feel like nobody understands how hard this is for me",negative
+"I'm worried I might fail this subject",negative
+"I feel nervous about talking to my professor",negative
+"I can't focus because I'm so tired",negative
+"I'm dreading the group presentation tomorrow",negative
+"I feel down because I got a low score",negative
+"I'm struggling to keep up with my readings",negative
+"I feel like crying because of all this stress",negative
+"I'm worried about my final grades this term",negative
+"I feel pressured to perform well in front of others",negative
+"I can't stop thinking about my unfinished tasks",negative
+"I feel mentally drained after a long day of classes",negative
+"I'm afraid I might disappoint my parents with my grades",negative
+"I feel so tired I can barely keep my eyes open",negative
+"I'm frustrated because my computer crashed and I lost my work",negative
+"I feel anxious every time I have to speak in class",negative
+"I'm sad because my groupmates left all the work to me",negative
+"I feel like I'm always running out of time",negative
+"I'm stressed about juggling school and personal problems",negative
+"I feel discouraged after getting low feedback on my paper",negative
+"I'm worried I won't finish my thesis on time",negative
+"I feel anxious about the upcoming oral exam",negative
+"I'm tired of pulling all-nighters just to meet deadlines",negative
+"I feel like I'm falling behind in my studies",negative
+"I'm upset because I missed an important deadline",negative
+"I feel nervous about my upcoming defense",negative
+"I'm overwhelmed by the amount of readings this week",negative
+"I feel guilty for not studying enough today",negative
+"I'm worried about disappointing my adviser",negative
+"I feel like everything is piling up at once",negative
+"I'm scared of failing this major exam",negative
+"I feel emotionally exhausted from school stress",negative
+"I don't know where to start with all of this",negative
+"there's too many things to do and I don't know where to begin",negative
+"I'm so behind on everything, it's overwhelming",negative
+"I feel like I can't catch up no matter how hard I try",negative
+"nothing is going right for me at school lately",negative
+"I feel stuck and I don't know how to move forward",negative
+"I'm so tired of feeling like I'm not enough",negative
+"I keep procrastinating because everything feels impossible",negative
+"I have a meeting with my adviser tomorrow at 10am",neutral
+"My class starts at 8 in the morning",neutral
+"I need to submit my assignment by Friday",neutral
+"The library is open until 6pm today",neutral
+"I have three subjects this semester",neutral
+"Our group will meet later to discuss the project",neutral
+"I am currently reading the course syllabus",neutral
+"The professor will give the exam schedule tomorrow",neutral
+"I need to print my documents for submission",neutral
+"Our school has an event next week",neutral
+"I have to attend a seminar this afternoon",neutral
+"The assignment instructions are posted online",neutral
+"I am taking notes during the lecture",neutral
+"Classes will resume after the break",neutral
+"I need to check my grades on the portal",neutral
+"The meeting was moved to next Monday",neutral
+"I am preparing my materials for the presentation",neutral
+"Our professor uploaded the lecture slides",neutral
+"I will go to the library to study later",neutral
+"The exam will cover chapters one to five",neutral
+"I have to revise my thesis chapter again",neutral
+"I am waiting for my professor's feedback",neutral
+"The deadline for the report is next week",neutral
+"I just woke up and I'm getting ready for class",neutral
+"I'm reviewing my notes before the quiz",neutral
+"The class schedule has been updated on the portal",neutral
+"I need to bring my laptop for tomorrow's activity",neutral
+"Our adviser asked us to submit a progress report",neutral
+"The exam venue was changed to room 204",neutral
+"I am organizing my files for the school requirements",neutral
+"The professor announced the topics for next week",neutral
+"I need to attend the orientation tomorrow",neutral
+"Our group chat has the updated schedule",neutral
+"I am downloading the reading materials for class",neutral
+"The school will be closed on Friday for a holiday",neutral
+"I have to photocopy some documents before class",neutral
+"The online class link was sent through email",neutral
+"I need to register for next semester's subjects",neutral
+"Our project proposal is due next month",neutral
+"The professor will discuss grading criteria tomorrow",neutral
+"I am checking the requirements for enrollment",neutral
+"The school bulletin posted the exam schedule",neutral
+"I have a group study session this evening",neutral
+"The laboratory class will be held in room 301",neutral
+"I need to update my student information form",neutral
+"Our class was rescheduled to next week",neutral
+"I am preparing my portfolio for submission",neutral
+"The professor will be on leave next week",neutral
+"I have to attend a webinar for extra credit",neutral
+"hi",neutral
+"hello",neutral
+"hey there",neutral
+"what's up",neutral
+"okay",neutral
+"I see",neutral
+"thanks",neutral
+"alright",neutral
+"noted",neutral
+"sure",neutral
+"grabe sobrang dami kong requirements ngayon",negative
+"di ko na kaya yung workload namin",negative
+"sobrang pagod na ako huhu",negative
+"naubos na lakas ko sa school",negative
+"nakakaloka yung daming deadlines",negative
+"praning na ako sa thesis",negative
+"walang gana pumunta ng klase",negative
+"lutang na lutang na ako",negative
+"lugmok na ako sa requirements",negative
+"kinakabahan ako sa presentation",negative
+"nakakastress yung group project namin",negative
+"nakakainis yung groupmates ko",negative
+"naiiyak na ko sa stress",negative
+"nag-iisa ako ngayon pagod na pagod",negative
+"wala sa mood mag-aral ngayon",negative
+"sobrang hirap ng subject na to",negative
+"down bad talaga ako ngayon sa school",negative
+"in my feels dahil sa grades ko",negative
+"crying rn kasi bumagsak ako sa quiz",negative
+"i'm so done with all these requirements fr",negative
+"burnout na talaga ako no cap",negative
+"brain rot na ko sa daming readings",negative
+"fml bumagsak na naman ako sa exam",negative
+"help grabe yung deadline bukas",negative
+"ngl super overwhelmed ako ngayon",negative
+"at this point di na ko makakaraos",negative
+"😭😭 grabe yung daming requirements",negative
+"sobrang pagod 😩 di na ko makahinga",negative
+"😰 kinakabahan talaga ako sa finals",negative
+"💀 patay na ako sa requirements",negative
+"T_T di ko na talaga kaya",negative
+"huhu nawala yung files ko 😭",negative
+">_< super stressed sa thesis defense",negative
+"grabe yung professor namin 😤 sobrang hirap",negative
+"fml 😵 so many things to do so little time",negative
+"petmalu yung score ko ngayon!",positive
+"slay talaga yung presentation namin",positive
+"kaya ko to laban lang",positive
+"todo effort kami ngayon nakaktuwa",positive
+"sana ol ang ganda ng group ko",positive
+"werpa yung team namin grabe",positive
+"nailed it sa recitation today yay",positive
+"masaya ako kasi pumasa ako 🎉",positive
+"yesss finally tapos na yung thesis 🏆",positive
+"sobrang saya ko ngayon 😊",positive
+"lodi talaga yung professor namin napaka-helpful",positive
+"feeling main character ngayon after acing the exam",positive
+"slayed yung defense ko today no cap",positive
+"understood the assignment sa project namin",positive
+"ate that presentation fr fr",positive
+"kaya natin to laban",positive
+"🔥 grabe yung score ko",positive
+"😁 finally tapos na yung requirements",positive
+"💪 motivated na ako ulit mag-aral",positive
+"🥳 passed all my subjects sana ol ang sarap",positive
+"✨ feeling refreshed after a good rest",positive
+"vibing lang ngayon wala namang problema",neutral
+"may meeting kami ng group bukas",neutral
+"keri lang yung schedule ngayon",neutral
+"oks lang basta matatapos rin",neutral
+"checking lang ng grades sa portal",neutral
+"it is what it is gagawin ko na lang",neutral
+"mid yung seminar kanina pero okay",neutral
+"rn nag-aaral lang ako for the quiz",neutral
