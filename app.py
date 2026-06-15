@@ -118,7 +118,16 @@ CRISIS_KEYWORDS = [
 TOO_SHORT_THRESHOLD = 4  # words
 
 
-def get_response(sentiment, user_text, confidence):
+CONSECUTIVE_NEGATIVE_RESPONSES = [
+    "I've noticed you've been feeling pretty stressed lately. That's completely valid — heavy feelings are real. How can I help lighten the load?",
+    "You've shared a lot of tough moments today. I want you to know you're not alone in this. Even small breaks can help reset things. Have you taken time for yourself?",
+    "It sounds like things have been really challenging. Remember that this feeling won't last forever, even though it feels heavy right now. What's one small thing that could help today?",
+    "I hear that you're going through a difficult stretch. Please be gentle with yourself. Would it help to talk about what's been the hardest part?",
+    "You've been carrying a lot. Stress like this deserves attention and care. Consider reaching out to someone you trust — a friend, counselor, or family member. You don't have to handle this alone.",
+]
+
+
+def get_response(sentiment, user_text, confidence, consecutive_negatives=0):
     lowered = user_text.lower()
     words = lowered.split()
 
@@ -128,6 +137,10 @@ def get_response(sentiment, user_text, confidence):
             "It's important to reach out to someone who can help right now — a school counselor, a trusted friend or family member, "
             "or a mental health professional. You deserve support."
         ), "crisis"
+
+    # Check for 3+ consecutive negatives and provide supportive follow-up
+    if consecutive_negatives >= 3 and sentiment == "negative":
+        return random.choice(CONSECUTIVE_NEGATIVE_RESPONSES), "negative"
 
     if len(words) <= TOO_SHORT_THRESHOLD and confidence < UNCLEAR_THRESHOLD:
         return random.choice(RESPONSES["unclear"]), "unclear"
@@ -144,51 +157,71 @@ def get_response(sentiment, user_text, confidence):
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    error_message = None
+
     if request.method == "POST":
-        username = request.form.get("username").strip()
-        email = request.form.get("email").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
         password = request.form.get("password")
         
         if not username or not email or not password:
-            return "Please fill out all fields.", 400
-            
-        # Securely hash the password before saving
-        hashed_password = generate_password_hash(password)
-        
-        try:
-            conn = sqlite3.connect(DATABASE_FILE)
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", 
-                           (username, email, hashed_password))
-            conn.commit()
-            conn.close()
-            return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            return "Username or Email already exists.", 400
-            
-    return render_template("signup.html")
+            error_message = "Please fill out all fields."
+        else:
+            # Securely hash the password before saving
+            hashed_password = generate_password_hash(password)
+            try:
+                conn = sqlite3.connect(DATABASE_FILE)
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", 
+                               (username, email, hashed_password))
+                conn.commit()
+                conn.close()
+                return redirect(url_for("login"))
+            except sqlite3.IntegrityError:
+                conn = sqlite3.connect(DATABASE_FILE)
+                cursor = conn.cursor()
+                cursor.execute("SELECT username, email FROM users WHERE username = ? OR email = ?", (username, email))
+                existing = cursor.fetchone()
+                conn.close()
+                if existing:
+                    if existing[0] == username:
+                        error_message = "That username is already taken. Please choose another."
+                    elif existing[1] == email:
+                        error_message = "An account with that email already exists. Please log in or use a different email."
+                    else:
+                        error_message = "Username or email already exists."
+                else:
+                    error_message = "Unable to create account. Please try again."
+
+    return render_template("signup.html", error=error_message)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error_message = None
+
     if request.method == "POST":
-        username = request.form.get("username").strip()
+        username = request.form.get("username", "").strip()
         password = request.form.get("password")
         
-        conn = sqlite3.connect(DATABASE_FILE)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-        user = cursor.fetchone()
-        conn.close()
-        
-        # user[3] corresponds to the hashed password column
-        if user and check_password_hash(user[3], password):
-            session["username"] = user[1] # Save username to session
-            return redirect(url_for("home"))
+        if not username or not password:
+            error_message = "Please enter both username and password."
         else:
-            return "Invalid username or password.", 401
+            conn = sqlite3.connect(DATABASE_FILE)
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+            user = cursor.fetchone()
+            conn.close()
             
-    return render_template("login.html")
+            if not user:
+                error_message = "No account found with that username. Please sign up first."
+            elif not check_password_hash(user[3], password):
+                error_message = "Password is incorrect. Please try again."
+            else:
+                session["username"] = user[1]  # Save username to session
+                return redirect(url_for("home"))
+            
+    return render_template("login.html", error=error_message)
 
 
 @app.route("/logout")
@@ -213,18 +246,79 @@ def get_history():
         rows = cursor.fetchall()
         conn.close()
 
-        history = [
-            {
+        history = []
+        for row in rows:
+            confidence_value = row[4]
+            if isinstance(confidence_value, (int, float)) and confidence_value <= 1:
+                confidence_value = round(confidence_value * 100, 1)
+
+            history.append({
                 "id": row[0],
                 "user_message": row[1],
                 "bot_response": row[2],
                 "sentiment": row[3],
-                "confidence": row[4],
+                "confidence": confidence_value,
                 "timestamp": row[5]
-            }
-            for row in rows
-        ]
+            })
         return jsonify({"history": history})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/get_mood_stats", methods=["GET"])
+def get_mood_stats():
+    """Get mood statistics for the logged-in user."""
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        
+        # Get all messages for this user ordered by timestamp
+        cursor.execute(
+            "SELECT sentiment, confidence FROM messages WHERE username = ? ORDER BY timestamp DESC LIMIT 100",
+            (session["username"],)
+        )
+        rows = cursor.fetchall()
+        conn.close()
+
+        if not rows:
+            return jsonify({
+                "total_messages": 0,
+                "most_common_mood": None,
+                "latest_mood": None,
+                "consecutive_negatives": 0,
+                "mood_distribution": {}
+            })
+
+        # Calculate statistics
+        sentiments = [row[0] for row in rows]
+        total = len(sentiments)
+        latest = sentiments[0]
+        
+        # Count mood distribution
+        mood_dist = {}
+        for sentiment in sentiments:
+            mood_dist[sentiment] = mood_dist.get(sentiment, 0) + 1
+        
+        most_common = max(mood_dist, key=mood_dist.get)
+        
+        # Detect consecutive negative messages
+        consecutive_neg = 0
+        for sentiment in sentiments:
+            if sentiment == "negative":
+                consecutive_neg += 1
+            else:
+                break
+        
+        return jsonify({
+            "total_messages": total,
+            "most_common_mood": most_common,
+            "latest_mood": latest,
+            "consecutive_negatives": consecutive_neg,
+            "mood_distribution": mood_dist
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -260,6 +354,9 @@ def home():
 def save_message(username, user_msg, bot_msg, sentiment, confidence):
     """Save a chat message to the database."""
     try:
+        if isinstance(confidence, (int, float)) and confidence <= 1:
+            confidence = round(confidence * 100, 1)
+
         conn = sqlite3.connect(DATABASE_FILE)
         cursor = conn.cursor()
         cursor.execute(
@@ -291,7 +388,19 @@ def predict():
     confidence = max(proba)
     confidence_pct = round(confidence * 100, 1)
 
-    bot_reply, display_sentiment = get_response(sentiment, user_message, confidence)
+    # Get current consecutive negatives count
+    conn = sqlite3.connect(DATABASE_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT sentiment FROM messages WHERE username = ? ORDER BY timestamp DESC LIMIT 5",
+        (session["username"],)
+    )
+    recent = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    
+    consecutive_neg = sum(1 for s in recent if s == "negative")
+    
+    bot_reply, display_sentiment = get_response(sentiment, user_message, confidence, consecutive_neg)
 
     # If not a crisis and we detected sarcasm in preprocessing, prefer a sarcasm-aware reply
     if display_sentiment != "crisis" and is_sarcasm:
@@ -302,14 +411,15 @@ def predict():
             # Fallback: leave original bot_reply
             pass
 
-    # Save message to database
-    save_message(session["username"], user_message, bot_reply, display_sentiment, confidence)
+    # Save message to database as percent so history display is consistent.
+    save_message(session["username"], user_message, bot_reply, display_sentiment, confidence_pct)
 
     return jsonify({
         "sentiment": display_sentiment,
         "raw_sentiment": sentiment,
         "confidence": confidence_pct,
-        "response": bot_reply
+        "response": bot_reply,
+        "consecutive_negatives": consecutive_neg
     })
 
 

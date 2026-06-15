@@ -70,6 +70,45 @@ async function loadChatHistory() {
 // Load history when page loads
 document.addEventListener("DOMContentLoaded", loadChatHistory);
 
+// Load and display mood statistics
+async function loadMoodStats() {
+  try {
+    const res = await fetch("/get_mood_stats");
+    const data = await res.json();
+
+    if (data.total_messages) {
+      document.getElementById("stat-total-messages").textContent = data.total_messages;
+
+      // Display most common mood with emoji
+      const moodEmojis = {
+        positive: "😊 Positive",
+        negative: "😔 Stressed",
+        neutral: "😐 Neutral",
+        unclear: "🤔 Unclear",
+        crisis: "🆘 Crisis",
+        sarcasm: "😏 Sarcasm"
+      };
+      document.getElementById("stat-most-common").textContent = moodEmojis[data.most_common_mood] || data.most_common_mood;
+
+      // Display latest mood
+      document.getElementById("stat-latest-mood").textContent = moodEmojis[data.latest_mood] || data.latest_mood;
+
+      // Show warning if 3+ consecutive negatives
+      const warningEl = document.getElementById("consecutive-warning");
+      if (data.consecutive_negatives >= 3) {
+        warningEl.style.display = "block";
+      } else {
+        warningEl.style.display = "none";
+      }
+    }
+  } catch (err) {
+    console.error("Error loading mood stats:", err);
+  }
+}
+
+// Load mood stats when page loads
+document.addEventListener("DOMContentLoaded", loadMoodStats);
+
 // Add a user bubble using the dynamic user initial
 function addUserMessage(text) {
   const row = document.createElement("div");
@@ -194,6 +233,7 @@ async function sendMessage() {
       addBotMessage("Sorry, something went wrong. Please try again.", null, null);
     } else {
       addBotMessage(data.response, data.sentiment, data.confidence);
+      loadMoodStats(); // Refresh mood statistics after new message
     }
 
   } catch (err) {

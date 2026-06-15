@@ -54,6 +54,15 @@
             outline: none;
             border-color: #57606f;
         }
+        .error-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #fdecea;
+            border: 1px solid #f5c2c0;
+            color: #b02a37;
+            border-radius: 8px;
+            font-size: 14px;
+        }
         button {
             width: 100%;
             padding: 12px;
@@ -89,6 +98,9 @@
     <p>Log in to talk with your companion</p>
     
     <form action="/login" method="POST">
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>

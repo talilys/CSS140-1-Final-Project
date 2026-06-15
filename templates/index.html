@@ -55,6 +55,25 @@
       </div>
     </div>
 
+    <div class="mood-summary" id="mood-summary" style="background: var(--sand); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; margin-top: 20px; border: 1px solid var(--sand-mid);">
+      <p class="legend-label" style="margin-bottom: 12px;">Mood Summary</p>
+      <div class="summary-stat" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: var(--ink-soft);">
+        <span>Total analyzed:</span>
+        <strong id="stat-total-messages" style="color: var(--ink);">0</strong>
+      </div>
+      <div class="summary-stat" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: var(--ink-soft);">
+        <span>Most common:</span>
+        <strong id="stat-most-common" style="color: var(--ink);">—</strong>
+      </div>
+      <div class="summary-stat" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: var(--ink-soft);">
+        <span>Latest mood:</span>
+        <strong id="stat-latest-mood" style="color: var(--ink);">—</strong>
+      </div>
+      <div class="summary-stat" id="consecutive-warning" style="display: none; padding: 8px; background: #fdf0eb; border-radius: 4px; border-left: 3px solid #d17a5a; margin-top: 8px; font-size: 11px; color: #a85a3c;">
+        ⚠️ You've had several tough moments. Be gentle with yourself.
+      </div>
+    </div>
+
     <div class="sidebar-footer">
       <button id="clear-history-btn" class="clear-history-btn" style="width: 100%; padding: 10px 12px; margin-bottom: 12px; background-color: #e8f4f0; color: #2c3e50; border: 1px solid #52796f; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;">
         🗑️ Clear History
