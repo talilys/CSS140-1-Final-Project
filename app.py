@@ -5,24 +5,29 @@ Improved: confidence-based unclear detection, richer responses,
 context-aware follow-ups, better crisis handling, and SQLite-based auth.
 """
 
+import os
 import re
 import pickle
 import random
 import sqlite3
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
+from normalizer import normalize, get_sarcasm_response
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
 # CRITICAL: Set a secret key to enable session tracking (login states)
 app.secret_key = "easeai_super_secret_key_change_this_later"
 
-with open("model/sentiment_model.pkl", "rb") as f:
+# Load model relative to the app file so the server works even when started from another CWD.
+MODEL_PATH = os.path.join(BASE_DIR, "model", "sentiment_model.pkl")
+with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
 
 # Confidence threshold below which we ask for more context
 UNCLEAR_THRESHOLD = 0.50
-DATABASE_FILE = "data/users.db"
+DATABASE_FILE = os.path.join(BASE_DIR, "data", "users.db")
 
 
 # -----------------------------------------------------------
@@ -202,7 +207,8 @@ def predict():
     if not user_message.strip():
         return jsonify({"error": "Empty message"}), 400
 
-    cleaned = preprocess_text(user_message)
+    enriched, is_sarcasm, sarcasm_type = normalize(user_message)
+    cleaned = preprocess_text(enriched)
     sentiment = model.predict([cleaned])[0]
 
     proba = model.predict_proba([cleaned])[0]
@@ -210,6 +216,15 @@ def predict():
     confidence_pct = round(confidence * 100, 1)
 
     bot_reply, display_sentiment = get_response(sentiment, user_message, confidence)
+
+    # If not a crisis and we detected sarcasm in preprocessing, prefer a sarcasm-aware reply
+    if display_sentiment != "crisis" and is_sarcasm:
+        try:
+            bot_reply = get_sarcasm_response(sarcasm_type)
+            display_sentiment = "sarcasm"
+        except Exception:
+            # Fallback: leave original bot_reply
+            pass
 
     return jsonify({
         "sentiment": display_sentiment,
