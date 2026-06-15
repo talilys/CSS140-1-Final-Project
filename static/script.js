@@ -46,6 +46,30 @@ function scrollBottom() {
   chatScroll.scrollTop = chatScroll.scrollHeight;
 }
 
+// Load chat history on page load
+async function loadChatHistory() {
+  try {
+    const res = await fetch("/get_history");
+    const data = await res.json();
+    
+    if (data.history && data.history.length > 0) {
+      // Clear the initial greeting message
+      chatMessages.innerHTML = "";
+      
+      // Load all historical messages
+      data.history.forEach(msg => {
+        addUserMessage(msg.user_message);
+        addBotMessage(msg.bot_response, msg.sentiment, msg.confidence);
+      });
+    }
+  } catch (err) {
+    console.error("Error loading chat history:", err);
+  }
+}
+
+// Load history when page loads
+document.addEventListener("DOMContentLoaded", loadChatHistory);
+
 // Add a user bubble using the dynamic user initial
 function addUserMessage(text) {
   const row = document.createElement("div");
@@ -182,6 +206,39 @@ async function sendMessage() {
   sendBtn.disabled = false;
 }
 
+// Clear chat history
+async function clearChatHistory() {
+  if (!confirm("Are you sure you want to delete all chat history? This cannot be undone.")) {
+    return;
+  }
+
+  try {
+    const res = await fetch("/clear_history", { method: "POST" });
+    const data = await res.json();
+
+    if (data.success) {
+      chatMessages.innerHTML = "";
+      const row = document.createElement("div");
+      row.className = "msg-row bot-row";
+      const avatar = document.createElement("div");
+      avatar.className = "avatar bot-avatar";
+      avatar.textContent = "E";
+      const bubble = document.createElement("div");
+      bubble.className = "msg-bubble bot-bubble";
+      const p = document.createElement("p");
+      p.textContent = "Hi there 👋 I'm EaseAI. I'm here to listen and support you through the ups and downs of school life.";
+      bubble.appendChild(p);
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatMessages.appendChild(row);
+      scrollBottom();
+    }
+  } catch (err) {
+    alert("Error clearing history. Please try again.");
+    console.error(err);
+  }
+}
+
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
 
@@ -191,3 +248,9 @@ userInput.addEventListener("keydown", function(e) {
     sendMessage();
   }
 });
+
+// Clear history button
+const clearHistoryBtn = document.getElementById("clear-history-btn");
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener("click", clearChatHistory);
+}

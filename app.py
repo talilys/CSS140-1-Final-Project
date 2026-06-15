@@ -34,7 +34,7 @@ DATABASE_FILE = os.path.join(BASE_DIR, "data", "users.db")
 # Database Helper Functions
 # -----------------------------------------------------------
 def init_db():
-    """Creates the user table in SQLite if it doesn't exist yet."""
+    """Creates the user and messages tables in SQLite if they don't exist yet."""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute('''
@@ -43,6 +43,18 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            user_message TEXT NOT NULL,
+            bot_response TEXT NOT NULL,
+            sentiment TEXT NOT NULL,
+            confidence REAL NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(username) REFERENCES users(username)
         )
     ''')
     conn.commit()
@@ -185,6 +197,55 @@ def logout():
     return redirect(url_for("login"))
 
 
+@app.route("/get_history", methods=["GET"])
+def get_history():
+    """Retrieve chat history for the logged-in user."""
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, user_message, bot_response, sentiment, confidence, timestamp FROM messages WHERE username = ? ORDER BY id ASC",
+            (session["username"],)
+        )
+        rows = cursor.fetchall()
+        conn.close()
+
+        history = [
+            {
+                "id": row[0],
+                "user_message": row[1],
+                "bot_response": row[2],
+                "sentiment": row[3],
+                "confidence": row[4],
+                "timestamp": row[5]
+            }
+            for row in rows
+        ]
+        return jsonify({"history": history})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/clear_history", methods=["POST"])
+def clear_history():
+    """Clear chat history for the logged-in user."""
+    if "username" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM messages WHERE username = ?", (session["username"],))
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # -----------------------------------------------------------
 # Chat Routes
 # -----------------------------------------------------------
@@ -194,6 +255,21 @@ def home():
     if "username" not in session:
         return redirect(url_for("login"))
     return render_template("index.html")
+
+
+def save_message(username, user_msg, bot_msg, sentiment, confidence):
+    """Save a chat message to the database."""
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO messages (username, user_message, bot_response, sentiment, confidence) VALUES (?, ?, ?, ?, ?)",
+            (username, user_msg, bot_msg, sentiment, confidence)
+        )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Error saving message: {e}")
 
 
 @app.route("/predict", methods=["POST"])
@@ -225,6 +301,9 @@ def predict():
         except Exception:
             # Fallback: leave original bot_reply
             pass
+
+    # Save message to database
+    save_message(session["username"], user_message, bot_reply, display_sentiment, confidence)
 
     return jsonify({
         "sentiment": display_sentiment,

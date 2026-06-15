@@ -4,11 +4,17 @@ Trains on dataset that includes slangs and emojis.
 Normalizer runs on each row so the model learns from enriched text.
 """
 
+import os
 import re
 import pickle
 import pandas as pd
 import sys
-import os
+
+# Limit OpenBLAS threading to prevent memory allocation errors
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
 
 sys.path.insert(0, os.path.dirname(__file__))
 from normalizer import normalize
