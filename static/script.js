@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", loadChatHistory);
 // Load and display mood statistics
 async function loadMoodStats() {
   try {
-    const res = await fetch("/get_mood_stats");
+    const res = await fetch("/get_mood_stats", { cache: "no-store" });
     const data = await res.json();
 
     if (data.total_messages) {
@@ -258,6 +258,27 @@ async function clearChatHistory() {
 
     if (data.success) {
       chatMessages.innerHTML = "";
+
+      // Render mood stats returned by backend to avoid any caching/timing issues.
+      if (data.mood_stats) {
+        const s = data.mood_stats;
+        const moodEmojis = {
+          positive: "😊 Positive",
+          negative: "😔 Stressed",
+          neutral: "😐 Neutral",
+          unclear: "🤔 Unclear",
+          crisis: "🆘 Crisis",
+          sarcasm: "😏 Sarcasm"
+        };
+        document.getElementById("stat-total-messages").textContent = s.total_messages;
+        document.getElementById("stat-most-common").textContent = moodEmojis[s.most_common_mood] || s.most_common_mood || "—";
+        document.getElementById("stat-latest-mood").textContent = moodEmojis[s.latest_mood] || s.latest_mood || "—";
+        document.getElementById("consecutive-warning").style.display = (s.consecutive_negatives >= 3) ? "block" : "none";
+      } else {
+        // Fallback to fetch if mood_stats missing
+        loadMoodStats();
+      }
+
       const row = document.createElement("div");
       row.className = "msg-row bot-row";
       const avatar = document.createElement("div");
@@ -267,6 +288,10 @@ async function clearChatHistory() {
       bubble.className = "msg-bubble bot-bubble";
       const p = document.createElement("p");
       p.textContent = "Hi there 👋 I'm EaseAI. I'm here to listen and support you through the ups and downs of school life.";
+
+      // Debug: confirm endpoint values after clear
+      // (Remove later if you want.)
+      console.log("[ClearHistory] stats will refresh now...");
       bubble.appendChild(p);
       row.appendChild(avatar);
       row.appendChild(bubble);

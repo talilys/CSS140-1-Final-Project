@@ -334,8 +334,55 @@ def clear_history():
         cursor = conn.cursor()
         cursor.execute("DELETE FROM messages WHERE username = ?", (session["username"],))
         conn.commit()
+
+        # Return fresh mood stats immediately after delete to avoid frontend timing/caching issues.
+        cursor.execute(
+            "SELECT sentiment, confidence FROM messages WHERE username = ? ORDER BY timestamp DESC LIMIT 100",
+            (session["username"],)
+        )
+        rows = cursor.fetchall()
         conn.close()
-        return jsonify({"success": True})
+
+        if not rows:
+            return jsonify({
+                "success": True,
+                "mood_stats": {
+                    "total_messages": 0,
+                    "most_common_mood": None,
+                    "latest_mood": None,
+                    "consecutive_negatives": 0,
+                    "mood_distribution": {}
+                }
+            })
+
+        sentiments = [row[0] for row in rows]
+        total = len(sentiments)
+        latest = sentiments[0]
+
+        mood_dist = {}
+        for sentiment in sentiments:
+            mood_dist[sentiment] = mood_dist.get(sentiment, 0) + 1
+
+        most_common = max(mood_dist, key=mood_dist.get)
+
+        consecutive_neg = 0
+        for sentiment in sentiments:
+            if sentiment == "negative":
+                consecutive_neg += 1
+            else:
+                break
+
+        return jsonify({
+            "success": True,
+            "mood_stats": {
+                "total_messages": total,
+                "most_common_mood": most_common,
+                "latest_mood": latest,
+                "consecutive_negatives": consecutive_neg,
+                "mood_distribution": mood_dist
+            }
+        })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

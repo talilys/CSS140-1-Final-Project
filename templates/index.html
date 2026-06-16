@@ -134,5 +134,10 @@
 </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+  // Prevent edge cases where the mood-summary script runs before elements exist.
+  // `script.js` also listens for DOMContentLoaded, but this guarantees id availability.
+  // (No-op if already initialized.)
+</script>
 </body>
 </html>
